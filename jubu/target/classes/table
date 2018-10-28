@@ -1,0 +1,7 @@
+CREATE TABLE JU_CODE(
+    CODE VARCHAR2(10) PRIMARY KEY,
+    CODE_NAME VARCHAR2(30),
+    UP_CODE VARCHAR2(10),
+    CODE_LEVEL NUMBER
+);
+insert into ju_code values('C0000','전체',null,0);

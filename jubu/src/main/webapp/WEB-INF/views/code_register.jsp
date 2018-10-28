@@ -22,6 +22,14 @@
 </head>
 <script type="text/javascript">
 $(document).ready(function(){
+	$.ajax({
+		url : 'code_list',
+		dataType : 'json',
+		type : 'get',
+		success : function(data){
+			clist(data)
+		}
+	})
 	function submit(){
 		var fd = $("#form").serialize()
 		if($("#code_name").val()==""){
@@ -63,14 +71,7 @@ $(document).ready(function(){
 		})
 	}
 	window.onload = function(){
-		$.ajax({
-			url : 'code_list',
-			dataType : 'json',
-			type : 'get',
-			success : function(data){
-				clist(data)
-			}
-		})
+		
 	}
 	$(document).on('click','.code_name',function(){
 		var code = $(this).attr("param")

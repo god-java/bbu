@@ -8,7 +8,7 @@
 <style type="text/css">
 html,body,div,ul,li,a,span{margin:0; padding:0; outline:0; text-align:center; font-size:12px;}
 a{text-decoration:none; color:silver;}
-#header{width:100%; height:50px; border-bottom:1px solid black; position:fixed; top:0; left:0;}
+#header{width:100%; height:50px; border-bottom:1px solid black; position:fixed; top:0; left:0; background:rgba(0,0,0,0.5);}
 #header ul{width:100%; height:50px; line-height:50px;}
 #header li{width:10%; height:30px;}
 #top{width:100%; height:200px; text-align:center; line-height:200px; position:relative; margin-top:50px; border-bottom:1px solid #D8D8D8;}
