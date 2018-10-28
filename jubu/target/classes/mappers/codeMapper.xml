@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.bbu.jubu.dao.CodeDAO">
+	<select id="code_list" resultType="CodeVO">
+		SELECT CODE, LPAD(' ',2*(LEVEL-1))||CODE_NAME AS CODE_NAME, UP_CODE, CODE_LEVEL
+		FROM JU_CODE
+		START WITH UP_CODE IS NULL
+		CONNECT BY
+		PRIOR
+		CODE=UP_CODE
+	</select>
+	<select id="code_info" resultType="CodeVO">
+		SELECT * FROM JU_CODE WHERE CODE=#{code}
+	</select>
+	<insert id="code_register_ok" parameterType="CodeVO">
+		INSERT INTO JU_CODE VALUES((SELECT 'C'||TO_CHAR(MAX(SUBSTR(CODE,2))+1,'FM0000') FROM JU_CODE),#{code_name},#{up_code},#{code_level})
+	</insert>
+</mapper>
