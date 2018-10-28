@@ -16,15 +16,66 @@
 #code_register_table{width:700px; margin:50px auto; border-collapse:collapse;}
 #code_register_table td{text-align:center; border:1px solid #D8D8D8;}
 #code_register_table .left{width:20%; height:50px; font-weight:bolder;}
-#code_register_table .right{width:80%; height:50px;}
+#code_register_table .right{width:80%; height:50px; text-align:left; font-weight:bolder;}
 #code_register_table input[type='text']{width:80%; height:30px;}
 </style>
 </head>
 <script type="text/javascript">
 $(document).ready(function(){
+	function submit(){
+		var fd = $("#form").serialize()
+		if($("#code_name").val()==""){
+			alert("코드명을 입력해주세요.")
+			$("#code_name").focus()
+			return false
+		}else if($("#code_level").val()==""){
+			alert("상위 코드를 선택해주세요.")
+			return false
+		}
+		$.ajax({
+			url : 'code_register_ok',
+			type : 'post',
+			dataType : 'json',
+			data : fd,
+			success : function(data){
+				clist(data)
+			}
+		})
+	}
+	
+	function clist(data){
+		var clist = data.clist
+		var clist_html
+		$("#list_body").html("")
+		$.each(clist,function(i){
+			clist_html = "<tr>";
+			clist_html += 	"<td>"+clist[i].code+"</td>";
+			clist_html += 	"<td style='text-align:left; font-weight:bolder;'>"
+			for(var j=0; j<clist[i].code_level; j++){
+				clist_html += "&nbsp;&nbsp;&nbsp;&nbsp;"
+			}
+			clist_html +=		"<span class='code_name' param='"+clist[i].code+"' style='font-weight:bold; cursor:pointer;'>"+clist[i].code_name+"</span>"
+			clist_html +=	"</td>";
+			clist_html += 	"<td>"+clist[i].up_code+"</td>";
+			clist_html += 	"<td>"+clist[i].code_level+"</td>";
+			clist_html += "</tr>";
+			$("#list_body").append(clist_html)
+		})
+	}
+	window.onload = function(){
+		$.ajax({
+			url : 'code_list',
+			dataType : 'json',
+			type : 'get',
+			success : function(data){
+				clist(data)
+			}
+		})
+	}
 	$(document).on('click','.code_name',function(){
 		var code = $(this).attr("param")
-		console.log(code)
+		var top = $("#code_register_table").offset().top
+		console.log(top)
 		$.ajax({
 			url : 'code_info',
 			type : 'get',
@@ -38,43 +89,19 @@ $(document).ready(function(){
 				$("#up_code_td").html(cvo.code)
 				$("#code_level").val(cvo.code_level)
 				$("#code_level_td").html(cvo.code_level)
+				$("html, body").animate({'scrollTop':top},20)
 			}
 		})
 	})
+	$(document).on('keydown','#code_name',function(e){
+		if(e.keyCode=='13'){
+			submit()
+			$("#code_name").val("")
+		}
+	})
+	
 	$(document).on('click','#code_register_ok_btn',function(){
-		var fd = $("#form").serialize()
-		$.ajax({
-			url : 'code_register_ok',
-			type : 'post',
-			dataType : 'json',
-			data : fd,
-			success : function(data){
-				var clist = data.clist
-				var clist_html
-				clist_html += "<tr>";
-				clist_html += 	"<th>CODE</th>";
-				clist_html += 	"<th>CODE_NAME</th>";
-				clist_html += 	"<th>UP_CODE</th>";
-				clist_html += 	"<th>CODE_LEVEL</th>";
-				clist_html += "</tr>";
-				$("#code_list_table").html(clist_html)
-				$.each(clist,function(i){
-					clist_html = "";
-					clist_html += "<tr>";
-					clist_html += 	"<td>"+clist[i].code+"</td>";
-					clist_html += 	"<td style='text-align:left; font-weight:bolder;'>"
-					for(var j=0; j<clist[i].code_level; j++){
-						clist_html += "&nbsp;&nbsp;&nbsp;"
-					}
-					clist_html +=		"<span class='code_name' param='"+clist[i].code+"' style='font-weight:bold; cursor:pointer;'>"+clist[i].code_name+"</span>"
-					clist_html +=	"</td>";
-					clist_html += 	"<td>"+clist[i].up_code+"</td>";
-					clist_html += 	"<td>"+clist[i].code_level+"</td>";
-					clist_html += "</tr>";
-					$("#code_list_table").append(clist_html)
-				})
-			}
-		})
+		submit()
 	})
 })
 </script>
@@ -83,32 +110,34 @@ $(document).ready(function(){
 		<h1>소속을 선택해주세요.</h1>
 		<table id="code_list_table">
 			<tr>
-				<th>CODE</th>
+				<th style="width:10%;">CODE</th>
 				<th>CODE_NAME</th>
-				<th>UP_CODE</th>
-				<th>CODE_LEVEL</th>
+				<th style="width:10%;">UP_CODE</th>
+				<th style="width:10%;">CODE_LEVEL</th>
 			</tr>
-			<c:forEach var="clist" items="${clist }">
-				<tr>
-					<td>${clist.code }</td>
-					<td style="text-align:left;">
-						<c:forEach var="i" begin="0" end="${clist.code_level }">
-							&nbsp;
-						</c:forEach>
-						<span class="code_name" param="${clist.code }" style="font-weight:bold; cursor:pointer;">${clist.code_name }</span>
-					</td>
-					<td>${clist.up_code }</td>
-					<td>${clist.code_level }</td>
-				</tr>
-			</c:forEach>
+			<tbody id="list_body">
+				<%-- <c:forEach var="clist" items="${clist }">
+					<tr>
+						<td>${clist.code }</td>
+						<td style="text-align:left;">
+							<c:forEach begin="0" end="${clist.code_level }">
+								&nbsp;&nbsp;
+							</c:forEach>
+							<span class="code_name" param="${clist.code }" style="font-weight:bold; cursor:pointer;">${clist.code_name }</span>
+						</td>
+						<td>${clist.up_code }</td>
+						<td>${clist.code_level }</td>
+					</tr>
+				</c:forEach> --%>
+			</tbody>
 		</table>
 		<h1>코드 등록</h1>
-		<form name="form" id="form">
+		<form name="form" id="form" onsubmit="return false">
 			<table id="code_register_table">
 				<tr>
 					<td class="left">코드</td>
-					<td class="right" id="code_td">
-						
+					<td class="right">
+						<span id="code_td" style="margin-left:10px;"></span>
 					</td>
 				</tr>
 				<tr>
@@ -119,14 +148,14 @@ $(document).ready(function(){
 				</tr>
 				<tr>
 					<td class="left">상위코드</td>
-					<td class="right" id="up_code_td">
-						
+					<td class="right">
+						<span id="up_code_td" style="margin-left:10px;"></span>
 					</td>
 				</tr>
 				<tr>
 					<td class="left">코드레벨</td>
-					<td class="right" id="code_level_td">
-						
+					<td class="right">
+						<span id="code_level_td" style="margin-left:10px;"></span>
 					</td>
 				</tr>
 				<tr>

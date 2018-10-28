@@ -70,4 +70,12 @@ public class CodeController {
 		map.put("clist", clist);
 		return json(map);
 	}
+	@RequestMapping(value="/code_list",produces="application/text; charset=utf-8")
+	@ResponseBody
+	public String code_list() {
+		List<CodeVO> clist = cdao.code_list();
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("clist", clist);
+		return json(map);
+	}
 }
