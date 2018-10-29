@@ -5,3 +5,15 @@ CREATE TABLE JU_CODE(
     CODE_LEVEL NUMBER
 );
 insert into ju_code values('C0000','전체',null,0);
+
+create table ju_franchise_req(
+	franchise_seq_code varchar2(20) primary key,
+	member_code varchar2(20),
+	hope_franchise varchar2(10),
+	hope_place varchar2(10),
+	capital number,
+	resp_check varchar2(10),
+	constraint ju_franchise_req_fk1 foreign key(member_code) references ju_member(member_code),
+	constraint ju_franchise_req_fk2 foreign key(hope_franchise) references ju_code(code),
+	constraint ju_franchise_req_fk3 foreign key(hope_place) references ju_code(code)
+);
